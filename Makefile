@@ -1,8 +1,8 @@
 all:MIPS
 MIPS: modules
 modules:
-	iverilog -o MIPS src/main/verilog/ULA.v
-teste:
-	iverilog -o MIPS_Test src/main/verilog/ULA.v
+	iverilog -o MIPS src/registers.v tb/registers_testbench.v
+	./MIPS
+	gtkwave registers_testbench.vcd
 clear:
 	rm *.out
