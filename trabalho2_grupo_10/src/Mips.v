@@ -11,4 +11,12 @@ module Mips (
 	output		chip_en
 );
 
+reg internalClock;
+
+always @(posedge clock) internalClock = !internalClock;
+
+always @(negedge reset) begin
+	internalClock <= 0;
+end
+
 endmodule
