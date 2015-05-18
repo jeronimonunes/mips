@@ -10,7 +10,7 @@ O objetivo desse projeto é implementar a máquina MIPS em Verilog para a entreg
 Após fazer o download desse repositório é possível compilar o MIPS através do comando make.
 O make teste rodará as rotinas de teste do processador MIPS gerando todos os arquivos para serem analizados pelo GtkWave
 
-# Programas requeirdos!
+# Programas requeridos!
 
 * iverilog para a compilação do código.
 * gtkwave para acompanhamento dos arquivos de testes gerados.
