@@ -1,15 +1,36 @@
 module main;
+
 	reg clock;
 	reg reset;
-	reg [17:0]	addr;
+	wire [17:0]	addr;
 	wire [15:0] data;
-	reg wre;
-	reg oute;
-	reg hb_mask;
-	reg lb_mask;
-	reg chip_en;
+	wire wre;
+	wire oute;
+	wire hb_mask;
+	wire lb_mask;
+	wire chip_en;
 
-	Mips mips(clock, reset, addr, data, wre, oute, hb_mask, lb_mask, chip_en);
+	Mips mips(
+		.clock(clock),
+		.reset(reset),
+		.addr(addr),
+		.data(data),
+		.wre(wre),
+		.oute(oute),
+		.hb_mask(hb_mask),
+		.lb_mask(lb_mask),
+		.chip_en(chip_en)
+	);
+
+	Ram RAM(
+		.addr(addr),
+		.data(data),
+		.wre(wre),
+		.oute(oute),
+		.hb_mask(hb_mask),
+		.lb_mask(lb_mask),
+		.chip_en(chip_en)
+	);
 
 	initial begin
 	   clock = 0;
@@ -32,13 +53,17 @@ module main;
 	always
 	   #1 clock = !clock;
 
-   initial begin
-      $dumpfile("mips.vcd");
-      $dumpvars(1, main.mips);
-      $monitor("reset=%b addra =%b dataa=%b addrb=%b datab=%b enc=%b addrc=%b datac=%b", reset, addra, dataa, addrb, datab, enc, addrc, datac);
-      #2 -> reset_trigger;
-      @ (reset_done_trigger);
+	initial begin
+		$readmemh("/home/grad/ccomp/13/jeronimonunes/data.hex", main.RAM.memory);
+		$display("%x\n",main.RAM.memory[1]);
+
+		$dumpfile("mips.vcd");
+		$dumpvars(1, main.mips);
+		#2 -> reset_trigger;
+		@ (reset_done_trigger);
+
+	end
 
 	initial
-	   #500  $finish;
+		#500  $finish;
 endmodule /* main */

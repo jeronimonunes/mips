@@ -1,7 +1,7 @@
 MIPS: tb/tb_Mips.v src/Mips.v
-	iverilog -o MIPS tb/tb_Mips.v src/Mips.v
+	iverilog -o MIPS tb/tb_Mips.v src/Mips.v src/Ram.v
 	./MIPS
-	gtkwave mips.vcd
+	#gtkwave mips.vcd
 clear:
 	rm *.o
 all:modules
