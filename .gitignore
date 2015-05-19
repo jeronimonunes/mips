@@ -1,3 +1,4 @@
-MIPS
-MIPS_Test
 *~
+MIPS
+*.vcd
+a.out
