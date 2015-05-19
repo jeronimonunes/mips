@@ -54,8 +54,12 @@ module main;
 	   #1 clock = !clock;
 
 	initial begin
-		$readmemh("/home/grad/ccomp/13/jeronimonunes/data.hex", main.RAM.memory);
-		$display("%x\n",main.RAM.memory[1]);
+		$readmemh("fibonacci.ram", main.RAM.memory);
+		//Testando o carregamento do arquivo
+		if(main.RAM.memory[1]!=16'h0006 || main.RAM.memory[27]!=16'h0003 || main.RAM.memory[29]!=16'h4820)
+			$display("Erro ao carregar a memória RAM");
+		else
+			$display("Memória carregada com sucesso!!!");	
 
 		$dumpfile("mips.vcd");
 		$dumpvars(1, main.mips);
