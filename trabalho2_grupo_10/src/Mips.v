@@ -41,24 +41,7 @@ MemControler memControler(
     .mc_ram_wre(wre),
     .mc_ram_data(data)
 );
-/*
-	//Memory Controler 
-	wire if_mc_en; 
-	wire [17:0] if_mc_addr;
-	wire [31:0] mc_if_data;
 
-	//Memory.Execute	
-	wire ex_mem_readmem,
-	ex_mem_writemem,
-	ex_mem_writereg,
-	mem_wb_writereg,
-	ex_mem_selwsource;
-	wire [31:0] ex_mem_regb;
-	wire [4:0] ex_mem_regdest;
-	wire [31:0] ex_mem_wbvalue;
-	wire [4:0] mem_wb_regdest;
-	wire [31:0] mem_wb_wbvalue;
-*/
 
 Memory MEMORY(
     .clock(clock),
@@ -71,6 +54,7 @@ Memory MEMORY(
     .ex_mem_regdest(EXECUTE.ex_mem_regdest),
     .ex_mem_writereg(EXECUTE.ex_mem_writereg),
     .ex_mem_wbvalue(EXECUTE.ex_mem_wbvalue),
+
     //Memory Controller
     .mem_mc_rw(memControler.mem_mc_rw),
     .mem_mc_en(memControler.mem_mc_en),
@@ -118,11 +102,11 @@ Writeback WRITEBACK(
     //Memory
     .mem_wb_regdest(MEMORY.mem_wb_regdest),
     .mem_wb_writereg(MEMORY.mem_wb_writereg),
-    .mem_wb_wbvalue(MEMORY.mem_wb_regdest),
+    .mem_wb_wbvalue(MEMORY.mem_wb_wbvalue),
     //Registers
-    .wb_reg_en(REGISTERS.wb_reg_en),
-    .wb_reg_addr(REGISTERS.wb_reg_addr),
-    .wb_reg_data(REGISTERS.wb_reg_data)
+    .wb_reg_en(REGISTERS.enc),
+    .wb_reg_addr(REGISTERS.addrc),
+    .wb_reg_data(REGISTERS.datac)
 );
 
 Fetch FETCH(
@@ -180,34 +164,39 @@ Decode DECODE(
 	.reg_id_ass_datab(REGISTERS.ass_datab)
 );
 
-wire clock,
-	reset,
-	addra,
-	dataa,
-	ass_dataa,
-	addrb,
-	datab,
-	ass_datab,
-	enc,
-	addrc,
-	datac,
-	addrout,
-	regout;
+//wire clock,
+//	reset,
+//	addra,
+//	dataa,
+//	ass_dataa,
+//	addrb,
+//	datab,
+//	ass_datab,
+//	enc,
+//	addrc,
+//	datac,
+//	addrout,
+//	regout;
+
+wire [4:0] addrout;
+wire [31:0] regout;
+
+
 
 Registers REGISTERS (
-	clock,
-	reset,
-	addra(DECODE.addra),
-	dataa(DECODE.dataa),
+	.clock(clock),
+	.reset(reset),
+	.addra(DECODE.id_reg_addra),
+	.dataa(DECODE.reg_id_dataa),
 	.ass_dataa(DECODE.reg_id_ass_dataa),
-	addrb(DECODE.addrb),
-	.datab(DECODE.datab),
+	.addrb(DECODE.id_reg_addrb),
+	.datab(DECODE.reg_id_datab),
 	.ass_datab(DECODE.reg_id_ass_datab),
-	enc,
-	addrc,
-	datac,
-	addrout,
-	regout
+	.enc(WRITEBACK.wb_reg_en),
+	.addrc(WRITEBACK.wb_reg_addr),
+	.datac(WRITEBACK.wb_reg_data),
+	.addrout(addrout),
+	.regout(regout)
 );
 
 endmodule
