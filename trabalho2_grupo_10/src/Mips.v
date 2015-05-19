@@ -172,12 +172,12 @@ Decode DECODE(
 	.id_ex_writereg(EXECUTE.id_ex_writereg),
 	.id_ex_writeov(EXECUTE.id_ex_writeov),
  //Registers
-	.id_reg_addra(REGISTERS.id_reg_addra),
-	.id_reg_addrb(REGISTERS.id_reg_addrb),
-	.reg_id_dataa(REGISTERS.reg_id_dataa),
-	.reg_id_datab(REGISTERS.reg_id_datab),
-	.reg_id_ass_dataa(REGISTERS.reg_id_ass_dataa),
-	.reg_id_ass_datab(REGISTERS.reg_id_ass_datab)
+	.id_reg_addra(REGISTERS.addra),
+	.id_reg_addrb(REGISTERS.addrb),
+	.reg_id_dataa(REGISTERS.dataa),
+	.reg_id_datab(REGISTERS.datab),
+	.reg_id_ass_dataa(REGISTERS.ass_dataa),
+	.reg_id_ass_datab(REGISTERS.ass_datab)
 );
 
 wire clock,
@@ -197,12 +197,12 @@ wire clock,
 Registers REGISTERS (
 	clock,
 	reset,
-	addra,
-	dataa,
-	ass_dataa,
-	addrb,
-	datab,
-	ass_datab,
+	addra(DECODE.addra),
+	dataa(DECODE.dataa),
+	.ass_dataa(DECODE.reg_id_ass_dataa),
+	addrb(DECODE.addrb),
+	.datab(DECODE.datab),
+	.ass_datab(DECODE.reg_id_ass_datab),
 	enc,
 	addrc,
 	datac,
