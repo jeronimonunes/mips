@@ -10,7 +10,7 @@ module main;
 	wire lb_mask;
 	wire chip_en;
 
-	Mips mips(
+	Mips MIPS(
 		.clock(clock),
 		.reset(reset),
 		.addr(addr),
@@ -56,18 +56,18 @@ module main;
 	initial begin
 		$readmemh("fibonacci.ram", main.RAM.memory);
 		//Testando o carregamento do arquivo
-		if(main.RAM.memory[1]!=16'h0006 || main.RAM.memory[27]!=16'h0003 || main.RAM.memory[29]!=16'h4820)
+		if(main.RAM.memory[5]!=16'h0006 || main.RAM.memory[31]!=16'h0003 || main.RAM.memory[33]!=16'h4820 || main.RAM.memory[262143]!=16'h0000)
 			$display("Erro ao carregar a memória RAM");
 		else
-			$display("Memória carregada com sucesso!!!");	
+			$display("Memória carregada com sucesso!!!");
 
 		$dumpfile("mips.vcd");
-		$dumpvars(1, main.mips);
+		$dumpvars(1, main.MIPS);
 		#2 -> reset_trigger;
 		@ (reset_done_trigger);
-
+		#700 $display("%d",main.MIPS.REGISTERS.registers[2]);
 	end
 
 	initial
-		#500  $finish;
+		#1000  $finish;
 endmodule /* main */
