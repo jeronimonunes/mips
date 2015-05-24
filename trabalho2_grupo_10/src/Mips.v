@@ -1,5 +1,5 @@
 module Mips (
-	input clock,
+	input clockFast,
 	input reset,
 	//RAM
 	output	[17:0]	addr,
@@ -12,20 +12,21 @@ module Mips (
 );
 
 //Pedaço do clock dividido;
-reg internalClock;
+reg clock;
 
-always @(posedge clock) internalClock = !internalClock;
+assign oute = 0;
+assign hb_mask = 0;
+assign lb_mask = 0;
+assign chip_en = 0;
+
+always @(posedge clockFast) clock = !clock;
 
 always @(negedge reset) begin
-	internalClock <= 0;
+	clock <= 0;
 end
 
-//Fios
-wire [17:0] mc_ram_addr;
-assign mc_ram_addr = addr;
-
 MemControler memControler(
-    .clock(clock),
+    .clock(clockFast),
     .reset(reset),
     //Fetch
     .if_mc_en(FETCH.if_mc_en),
