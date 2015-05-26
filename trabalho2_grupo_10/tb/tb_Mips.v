@@ -4,7 +4,7 @@ module main;
 	reg reset;
 
 	Mips MIPS(
-		.clockFast(clock),
+		.clock(clock),
 		.reset(reset),
 		.addr(RAM.addr),
 		.data(RAM.data),
@@ -68,9 +68,9 @@ module main;
 		@ (reset_done_trigger);
 		$readmemh("tb/sub.ram", main.RAM.memory);
 		#20 if (main.MIPS.REGISTERS.registers[4] == 6)begin
-			display("A instrução SUB foi executada corretamente");
+			$display("A instrução SUB foi executada corretamente");
 		end else begin
-			display("A instrução SUB não foi executada corretamente");
+			$display("A instrução SUB não foi executada corretamente");
 		end
 
 		/*
@@ -80,9 +80,9 @@ module main;
 		@ (reset_done_trigger);
 		$readmemh("tb/add.ram", main.RAM.memory);
 		#20 if (main.MIPS.REGISTERS.registers[4] == 26)begin
-			display("A instrução ADD foi executada corretamente");
+			$display("A instrução ADD foi executada corretamente");
 		end else begin
-			display("A instrução ADD não foi executada corretamente");
+			$display("A instrução ADD não foi executada corretamente");
 		end
 		
 		/*
@@ -93,9 +93,9 @@ module main;
 		@ (reset_done_trigger);
 		$readmemh("tb/add.ram", main.RAM.memory);
 		#20 if (main.MIPS.REGISTERS.registers[4] == 26)begin
-			display("A instrução ADD foi executada corretamente");
+			$display("A instrução ADD foi executada corretamente");
 		end else begin
-			display("A instrução ADD não foi executada corretamente");
+			$display("A instrução ADD não foi executada corretamente");
 		end
 
 			
