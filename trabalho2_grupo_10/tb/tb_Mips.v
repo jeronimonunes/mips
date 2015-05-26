@@ -44,17 +44,61 @@ module main;
 	end
 
 	always
-	   #1 clock = !clock;
+	   #1 clock = !clock; 
 
 	initial begin
 		$dumpfile("mips.vcd");
 		$dumpvars(0, main.MIPS);
 		$dumpvars(0, main.RAM);
-		$dumpvars(0,main.MIPS.REGISTERS.registers);
+		
+		/*
+		instrução ADDI
+		 */
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
 		$readmemh("tb/addi.ram", main.RAM.memory);
-		#20 $display("%d",main.MIPS.REGISTERS.registers[2]);
+
+		#20
+
+		
+		/*
+		instrução SUB
+		 */
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/sub.ram", main.RAM.memory);
+		#20 if (main.MIPS.REGISTERS.registers[4] == 6)begin
+			display("A instrução SUB foi executada corretamente");
+		end else begin
+			display("A instrução SUB não foi executada corretamente");
+		end
+
+		/*
+		instrução ADD
+		 */
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/add.ram", main.RAM.memory);
+		#20 if (main.MIPS.REGISTERS.registers[4] == 26)begin
+			display("A instrução ADD foi executada corretamente");
+		end else begin
+			display("A instrução ADD não foi executada corretamente");
+		end
+		
+		/*
+		
+		 */
+		
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/add.ram", main.RAM.memory);
+		#20 if (main.MIPS.REGISTERS.registers[4] == 26)begin
+			display("A instrução ADD foi executada corretamente");
+		end else begin
+			display("A instrução ADD não foi executada corretamente");
+		end
+
+			
 /*		#1
 		$readmemh("fibonacci.ram", main.RAM.memory);
 		//Testando o carregamento do arquivo
