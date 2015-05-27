@@ -1,28 +1,36 @@
 module main;
 
 	reg clock;
-	reg reset;
+
+	 reg reset;
+	 wire [17:0] addr;
+	 wire [15:0] data;
+	 wire wre;
+	 wire oute;
+	 wire hb_mask;
+	 wire lb_mask;
+	 wire chip_en;
 
 	Mips MIPS(
-		.clock(clock),
-		.reset(reset),
-		.addr(RAM.addr),
-		.data(RAM.data),
-		.wre(RAM.wre),
-		.oute(RAM.oute),
-		.hb_mask(RAM.hb_mask),
-		.lb_mask(RAM.lb_mask),
-		.chip_en(RAM.chip_en)
+		clock,
+		reset,
+		addr,
+		data,
+		wre,
+		oute,
+		hb_mask,
+		lb_mask,
+		chip_en
 	);
 
 	Ram RAM(
-		.addr(MIPS.addr),
-		.data(MIPS.data),
-		.wre(MIPS.wre),
-		.oute(MIPS.oute),
-		.hb_mask(MIPS.hb_mask),
-		.lb_mask(MIPS.lb_mask),
-		.chip_en(MIPS.chip_en)
+		addr,
+		data,
+		wre,
+		oute,
+		hb_mask,
+		lb_mask,
+		chip_en
 	);
 
 	initial begin
@@ -51,19 +59,16 @@ module main;
 		$dumpvars(0, main.MIPS);
 		$dumpvars(0, main.RAM);
 		
-		/*
-		instrução ADDI
-		 */
+		/**
+		* instrução ADDI
+		*/
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
 		$readmemh("tb/addi.ram", main.RAM.memory);
 
-		#20
-
-		
+			
 		/*
 		instrução SUB
-		 */
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
 		$readmemh("tb/sub.ram", main.RAM.memory);
@@ -74,21 +79,20 @@ module main;
 		end
 
 		/*
-		instrução ADD
-		 */
+		instrução ADD: 15+11
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
 		$readmemh("tb/add.ram", main.RAM.memory);
+		$display("%d", main.MIPS.REGISTERS.registers[28]);
 		#20 if (main.MIPS.REGISTERS.registers[4] == 26)begin
 			$display("A instrução ADD foi executada corretamente");
 		end else begin
 			$display("A instrução ADD não foi executada corretamente");
 		end
+		
+		 */
 		
 		/*
-		
-		 */
-		
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
 		$readmemh("tb/add.ram", main.RAM.memory);
@@ -97,7 +101,7 @@ module main;
 		end else begin
 			$display("A instrução ADD não foi executada corretamente");
 		end
-
+	
 			
 /*		#1
 		$readmemh("fibonacci.ram", main.RAM.memory);

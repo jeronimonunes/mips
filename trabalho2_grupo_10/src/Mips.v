@@ -1,5 +1,5 @@
   module Mips (
-	input clock,
+	input clockFast,
 	input reset,
 	//RAM
 	output	[17:0]	addr,
@@ -12,17 +12,17 @@
 );
 
 //Pedaço do clock dividido;
-reg clockFast;
+reg clock;
 
 assign oute = 0;
 assign hb_mask = 0;
 assign lb_mask = 0;
 assign chip_en = 0;
 
-always @(clock) clockFast = !clockFast;
+always @(posedge clockFast) clock = !clock;
 
 always @(negedge reset) begin
-	clockFast <= 0;
+	clock <= 0;
 end
 
 //Wires por causa do erro relatado no e-mail
@@ -33,7 +33,6 @@ end
 	wire [4:0] addrout;
 	wire [31:0] ass_dataa;
 	wire [31:0] ass_datab;
-	wire clock;
 	wire [31:0] dataa;
 	wire [31:0] datab;
 	wire [31:0] datac;
