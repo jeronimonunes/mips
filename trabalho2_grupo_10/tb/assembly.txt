@@ -57,3 +57,10 @@ nop
 nop
 nor $6, $5, $5
 
+
+beq.ram
+
+nop
+nop
+addi $15, $15, 1
+beq $0,$0,-4

@@ -36,6 +36,11 @@ module main;
 	   clock = 0;
 	end
 
+	/**
+	 * Eventos criados para reset do processador
+	 * Como cada instrução vai ser testada individualmente com uma memória limpa,
+	 * será necessário
+	 */
 	event reset_trigger;
 	event reset_done_trigger;
 
@@ -114,6 +119,19 @@ module main;
 			$display("A instrução NOR foi executada corretamente");
 		else
 			$display("A instrução NOR não foi executada corretamente");
+
+		/**
+		 * Instrução BEQ
+		 * addi $5, $0, 7
+		 * nor $6, $5, $5
+		 */
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/beq.ram", main.RAM.memory); 
+		#100 if (main.MIPS.REGISTERS.registers[15] == 4)
+			$display("A instrução BEQ foi executada corretamente");
+		else
+			$display("A instrução BEQ não foi executada corretamente");
 
 		/**
 		* instrução ADDI $2, $0, 4
