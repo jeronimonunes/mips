@@ -1,0 +1,59 @@
+addi.ram
+
+nop
+nop
+addi $2, $0, 4  //4 no registers [2]
+
+
+
+sub.ram
+
+nop
+nop
+addi $10, $0, 1
+addi $11, $0, -57
+sub $12, $10, $11 //58 no registers[12]
+
+
+
+add.ram
+
+nop
+nop
+addi $29, $0, 5
+addi $30, $0, 4
+add $31, $29, $30 //9 no registers[31]
+
+
+
+or.ram
+
+nop
+nop
+addi $6, $0, 3
+addi $7, $0, 4
+or $8, $6, $7    //7 no registers[8]
+
+
+
+subu.ram
+
+nop
+nop
+addi $17, $0, -5
+addi $16, $0, 2
+subu $18, $17, $16  //4294967289 ou 'hfffffff9 no registers[18]
+
+
+nor.ram
+
+nop
+nop
+addi $5, $0, 7
+nop
+nop
+nop
+nop
+nop
+nor $6, $5, $5
+

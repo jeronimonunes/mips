@@ -18,7 +18,7 @@ exit:	return $2;
 
 MIPS assembler
 fibonacci:	NOP
-	addi $4, $0, 5 //mudar o 5 para alguma outra coisa para calcular o fibonacci, pode usar um load word se quiser buscar a informação na memória. Ou ñ fazer essa instrução já que é o $a0, registrador de parâmetro de função. Mas não fiz as mudanças de stack pointer
+	addi $4, $0, 6 //mudar o 5 para alguma outra coisa para calcular o fibonacci, pode usar um load word se quiser buscar a informação na memória. Ou ñ fazer essa instrução já que é o $a0, registrador de parâmetro de função. Mas não fiz as mudanças de stack pointer
 	addi $8, $0, 2 //não entendi porque, mas assim funciona
 	addi $2, $0, 1
 	addi $9, $0, 1
@@ -26,11 +26,11 @@ fibonacci:	NOP
 	NOP
 LOOP:   addi $8, $8, 1
 	sub $11, $4, $8
+	NOP
+	NOP
+	NOP
+	NOP
 	beq $11, $0, EXIT
-	NOP
-	NOP
-	NOP
-	NOP
 	add $9, $2, $0 //não precisa usar o reg $10 pq a instrução demora
 	add $2, $2, $9
 	beq $0, $0, LOOP

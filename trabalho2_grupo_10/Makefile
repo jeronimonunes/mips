@@ -1,7 +1,7 @@
 MIPS: tb/tb_Mips.v src/Mips.v src/Ram.v src/MemControler.v src/Memory.v src/Execute.v src/Writeback.v src/Fetch.v src/Decode.v src/Registers.v src/Alu.v src/Shifter.v src/Comparator.v src/Control.v
 	iverilog -o MIPS tb/tb_Mips.v src/Mips.v src/Ram.v src/MemControler.v src/Memory.v src/Execute.v src/Writeback.v src/Fetch.v src/Decode.v src/Registers.v src/Alu.v src/Shifter.v src/Comparator.v src/Control.v
 	./MIPS
-	#gtkwave mips.vcd
+	gtkwave mips.vcd
 clear:
 	rm *.o MIPS
 all:modules

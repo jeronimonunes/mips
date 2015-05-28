@@ -11,22 +11,39 @@
 	output		chip_en
 );
 
-//Pedaço do clock dividido;
-reg clock;
+	/**
+	 * Clock interno, mais lento.
+	 * Necessário pois o módulo memControler busca as informações na RAM em duas vezes
+	 * Primeiro os primeiros 16bits e depois os últimos.
+	 */
+	reg clock;
 
-assign oute = 0;
-assign hb_mask = 0;
-assign lb_mask = 0;
-assign chip_en = 0;
+	assign oute = 0;
+	assign hb_mask = 0;
+	assign lb_mask = 0;
+	assign chip_en = 0;
 
-always @(posedge clockFast) clock = !clock;
+	/**
+	 * Erros esquisitos do iverilog
+	 * Se vc for lá no memControler e simplesmente colocar o addr, data e wre eles ficam como "z" e não funcionam
+	 * Bug estranho que tomou horas para ser descoberto!
+	 */
+	/*assign addr = mc_ram_addr;
+	assign data = mc_ram_data;
+	assign wre = mc_ram_wre;*/
 
-always @(negedge reset) begin
-	clock <= 0;
-end
+	always @(posedge clockFast) clock = !clock;
 
-//Wires por causa do erro relatado no e-mail
+	always @(negedge reset) begin
+		clock <= 0;
+	end
 
+	/**
+	 * Poderia ter sido feito uma conexão hierárquica entre os módulos,
+	 * mas o iverilog faz algo super estranho e propaga alguns valores e "esquece" de outros
+	 * Então, após muito tempo tentando encontrar o erro e a informação do monitor que o 
+	 * simulador pode ter esse tipo de problema, substituimos tudo por wires.
+	 */
 	wire [4:0] addra;
 	wire [4:0] addrb;
 	wire [4:0] addrc;
@@ -92,160 +109,159 @@ end
 	wire [31:0] wb_reg_data;
 	wire wb_reg_en;
 
-MemControler memControler(
-    clockFast,
-    reset,
-    //Fetch
-    if_mc_en,
-    if_mc_addr,
-    mc_if_data,
-    //Memory
-    mem_mc_rw,
-    mem_mc_en,
-    mem_mc_addr,
-    mem_mc_data,
-    //Ram
-    mc_ram_addr,
-    mc_ram_wre,
-    mc_ram_data
-);
+	MemControler memControler(
+	    clockFast,
+	    reset,
+	    //Fetch
+	    if_mc_en,
+	    if_mc_addr,
+	    mc_if_data,
+	    //Memory
+	    mem_mc_rw,
+	    mem_mc_en,
+	    mem_mc_addr,
+	    mem_mc_data,
+	    //Ram
+	    addr,
+	    wre,
+	    data
+	);
 
 
-Memory MEMORY(
-    clock,
-    reset,
-    //Execute
-    ex_mem_readmem,
-    ex_mem_writemem,
-    ex_mem_regb,
-    ex_mem_selwsource,
-    ex_mem_regdest,
-    ex_mem_writereg,
-    ex_mem_wbvalue,
+	Memory MEMORY(
+	    clock,
+	    reset,
+	    //Execute
+	    ex_mem_readmem,
+	    ex_mem_writemem,
+	    ex_mem_regb,
+	    ex_mem_selwsource,
+	    ex_mem_regdest,
+	    ex_mem_writereg,
+	    ex_mem_wbvalue,
+	    //Memory Controller
+	    mem_mc_rw,
+	    mem_mc_en,
+	    mem_mc_addr,
+	    mem_mc_data,
+	    //Writeback
+	    mem_wb_regdest,
+	    mem_wb_writereg,
+	    mem_wb_wbvalue
+	);
 
-    //Memory Controller
-    mem_mc_rw,
-    mem_mc_en,
-    mem_mc_addr,
-    mem_mc_data,
-    //Writeback
-    mem_wb_regdest,
-    mem_wb_writereg,
-    mem_wb_wbvalue
-);
-
-Execute EXECUTE(
-	clock,
-	reset,
-    //Decode
-	id_ex_selalushift,
-	id_ex_selimregb,
-	id_ex_aluop,
-	id_ex_unsig,
-	id_ex_shiftop,
-	id_ex_shiftamt,
-	id_ex_rega,
-	id_ex_readmem,
-	id_ex_writemem,
-	id_ex_regb,
-	id_ex_imedext,
-	id_ex_selwsource,
-	id_ex_regdest,
-	id_ex_writereg,
-	id_ex_writeov,
-    //Fetch
-	ex_if_stall,
-    //Memory
-	ex_mem_readmem,
-	ex_mem_writemem,
-	ex_mem_regb,
-	ex_mem_selwsource,
-	ex_mem_regdest,
-	ex_mem_writereg,
-	ex_mem_wbvalue
-);
+	Execute EXECUTE(
+		clock,
+		reset,
+	    //Decode
+		id_ex_selalushift,
+		id_ex_selimregb,
+		id_ex_aluop,
+		id_ex_unsig,
+		id_ex_shiftop,
+		id_ex_shiftamt,
+		id_ex_rega,
+		id_ex_readmem,
+		id_ex_writemem,
+		id_ex_regb,
+		id_ex_imedext,
+		id_ex_selwsource,
+		id_ex_regdest,
+		id_ex_writereg,
+		id_ex_writeov,
+	    //Fetch
+		ex_if_stall,
+	    //Memory
+		ex_mem_readmem,
+		ex_mem_writemem,
+		ex_mem_regb,
+		ex_mem_selwsource,
+		ex_mem_regdest,
+		ex_mem_writereg,
+		ex_mem_wbvalue
+	);
 
 
-Writeback WRITEBACK(
-    //Memory
-    mem_wb_regdest,
-    mem_wb_writereg,
-    mem_wb_wbvalue,
-    //Registers
-    wb_reg_en,
-    wb_reg_addr,
-    wb_reg_data
-);
+	Writeback WRITEBACK(
+	    //Memory
+	    mem_wb_regdest,
+	    mem_wb_writereg,
+	    mem_wb_wbvalue,
+	    //Registers
+	    enc,
+	    addrc,
+	    datac
+	);
 
-Fetch FETCH(
-    clock,
-    reset,
-    //Execute
-    ex_if_stall,
-    //Decode
-    if_id_nextpc,
-    if_id_instruc,
-    id_if_selpcsource,
-    id_if_rega,
-    id_if_pcimd2ext,
-    id_if_pcindex,
-    id_if_selpctype,
-    //Memory Controller
-    if_mc_en,
-    if_mc_addr,
-    mc_if_data
-);
+	Fetch FETCH(
+	    clock,
+	    reset,
+	    //Execute
+	    ex_if_stall,
+	    //Decode
+	    if_id_nextpc,
+	    if_id_instruc,
+	    id_if_selpcsource,
+	    id_if_rega,
+	    id_if_pcimd2ext,
+	    id_if_pcindex,
+	    id_if_selpctype,
+	    //Memory Controller
+	    if_mc_en,
+	    if_mc_addr,
+	    mc_if_data
+	);
 
-Decode DECODE(
-	clock,
-	reset,
-    //Fetch
-	if_id_instruc,
-	if_id_nextpc,
-	id_if_selpcsource,
-	id_if_rega,
-	id_if_pcimd2ext,
-	id_if_pcindex,
-	id_if_selpctype,
-    //Execute
-	id_ex_selalushift,
-	id_ex_selimregb,
-	id_ex_aluop,
-	id_ex_unsig,
-	id_ex_shiftop,
-	id_ex_shiftamt,
-	id_ex_rega,
-	id_ex_readmem,
-	id_ex_writemem,
-	id_ex_regb,
-	id_ex_imedext,
-	id_ex_selwsource,
-	id_ex_regdest,
-	id_ex_writereg,
-	id_ex_writeov,
- //Registers
-	id_reg_addra,
-	id_reg_addrb,
-	reg_id_dataa,
-	reg_id_datab,
-	reg_id_ass_dataa,
-	reg_id_ass_datab
-);
+	Decode DECODE(
+		clock,
+		reset,
+	    //Fetch
+		if_id_instruc,
+		if_id_nextpc,
+		id_if_selpcsource,
+		id_if_rega,
+		id_if_pcimd2ext,
+		id_if_pcindex,
+		id_if_selpctype,
+	    //Execute
+		id_ex_selalushift,
+		id_ex_selimregb,
+		id_ex_aluop,
+		id_ex_unsig,
+		id_ex_shiftop,
+		id_ex_shiftamt,
+		id_ex_rega,
+		id_ex_readmem,
+		id_ex_writemem,
+		id_ex_regb,
+		id_ex_imedext,
+		id_ex_selwsource,
+		id_ex_regdest,
+		id_ex_writereg,
+		id_ex_writeov,
+	 //Registers
+		addra,
+		addrb,
+		dataa, 
+		datab,
+		ass_dataa,
+		ass_datab
+	);
 
-Registers REGISTERS (
-	clock,
-	reset,
-	addra,
-	dataa,
-	ass_dataa,
-	addrb,
-	datab,
-	ass_datab,
-	enc,
-	addrc,
-	datac,
-	addrout,
-	regout
-);
+	Registers REGISTERS (
+		clock,
+		reset,
+		addra,
+		dataa,
+		ass_dataa,
+		addrb,
+		datab,
+		ass_datab,
+		enc,
+		addrc,
+		datac, 
+		addrout,
+		regout
+	);
 
 endmodule
