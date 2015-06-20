@@ -1,7 +1,6 @@
 module main;
 
 	reg clock;
-
 	reg reset;
 	wire [17:0] addr;
 	wire [15:0] data;
@@ -10,9 +9,6 @@ module main;
 	wire hb_mask;
 	wire lb_mask;
 	wire chip_en;
-	wire [31:0] regout;
-	reg [4:0] addrout;
-	wire [31:0] memout;
 
 	Mips MIPS(
 		clock,
@@ -23,10 +19,7 @@ module main;
 		oute,
 		hb_mask,
 		lb_mask,
-		chip_en,
-		regout,
-		addrout,
-		memout
+		chip_en
 	);
 
 	Ram RAM(
@@ -43,6 +36,11 @@ module main;
 	   clock = 0;
 	end
 
+	/**
+	 * Eventos criados para reset do processador
+	 * Como cada instrução vai ser testada individualmente com uma memória limpa,
+	 * será necessário
+	 */
 	event reset_trigger;
 	event reset_done_trigger;
 
@@ -97,16 +95,50 @@ module main;
 		$dumpvars(0,main.MIPS.REGISTERS.registers[30]);
 		$dumpvars(0,main.MIPS.REGISTERS.registers[31]);
 
+		/**
+		* instrução INC $2, $0
+		* instrução INC $2, $2
+		*/
 		#3 -> reset_trigger;
 		@ (reset_done_trigger);
-		$readmemh("tb/inc.ram", main.RAM.memory);
-		#20 if (main.MIPS.REGISTERS.registers[2] == 2)begin
-			$display("A instrução SUB foi executada corretamente");
-		end else begin
-			$display("A instrução SUB não foi executada corretamente");
-		end
+		$readmemh("tb/inc.ram", main.RAM.memory); 
+		#50 if (main.MIPS.REGISTERS.registers[2] == 2)
+			$display("A instrução INC foi executada corretamente");
+		else
+			$display("A instrução INC não foi executada corretamente");
+
+		/**
+		* ADDI $29, 5
+		* ADDI $30, 4
+		* NOP * 4
+		* MUL $31, $30, $29
+		*/
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/mul.ram", main.RAM.memory); 
+		#100 if (main.MIPS.REGISTERS.registers[31] == 'h14)
+			$display("A instrução MUL foi executada corretamente");
+		else
+			$display("A instrução MUL não foi executada corretamente");
+
+/**
+		* ADDI $29, 0x7fff
+		* ADDI $30, 0x7fff
+		* NOP * 4
+		* MUL $29, $30, $29
+		* MUL $29, $30, $29
+		* A Instrução acima ativa o sinal de overflow como esperado.
+		*/
+
+		#3 -> reset_trigger;
+		@ (reset_done_trigger);
+		$readmemh("tb/mulovertest.ram", main.RAM.memory); 
+		#100 if (main.MIPS.REGISTERS.registers[29] == 'h3fff0001)
+			$display("Deu overflow! Tudo certo!");
+		else
+			$display("Não deu overflow! Algo errado ocorreu!");
 	end
 
 	initial
 		#1000  $finish;
-endmodule
+endmodule /* main */
