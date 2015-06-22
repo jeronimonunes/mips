@@ -9,6 +9,9 @@ module main;
 	wire hb_mask;
 	wire lb_mask;
 	wire chip_en;
+	wire [31:0] regout;
+	wire [4:0] addrout;
+	wire [31:0] memout;
 
 	Mips MIPS(
 		clock,
@@ -19,7 +22,10 @@ module main;
 		oute,
 		hb_mask,
 		lb_mask,
-		chip_en
+		chip_en,
+		regout,
+		addrout,
+		memout
 	);
 
 	Ram RAM(
@@ -47,11 +53,9 @@ module main;
 	initial begin
 		forever begin
 			@ (reset_trigger);
-			#1
-			reset = 1'b0;
-			#1
-			reset = 1'b1;
-			-> reset_done_trigger;
+			#1 reset = 1'b0;
+			#1 reset = 1'b1;
+			#1 -> reset_done_trigger;
 		end
 	end
 
@@ -100,11 +104,11 @@ module main;
 		* instrução INC $2, $2
 		*/
 		#3 -> reset_trigger;
-		@ (reset_done_trigger);
+		@(reset_done_trigger);
 		$readmemh("tb/inc.ram", main.RAM.memory); 
 		#50 if (main.MIPS.REGISTERS.registers[2] == 2)
 			$display("A instrução INC foi executada corretamente");
-		else
+		else 
 			$display("A instrução INC não foi executada corretamente");
 
 		/**
@@ -114,14 +118,14 @@ module main;
 		* MUL $31, $30, $29
 		*/
 		#3 -> reset_trigger;
-		@ (reset_done_trigger);
+		@(reset_done_trigger);
 		$readmemh("tb/mul.ram", main.RAM.memory); 
 		#100 if (main.MIPS.REGISTERS.registers[31] == 'h14)
 			$display("A instrução MUL foi executada corretamente");
 		else
 			$display("A instrução MUL não foi executada corretamente");
 
-/**
+		/**
 		* ADDI $29, 0x7fff
 		* ADDI $30, 0x7fff
 		* NOP * 4
@@ -129,10 +133,9 @@ module main;
 		* MUL $29, $30, $29
 		* A Instrução acima ativa o sinal de overflow como esperado.
 		*/
-
 		#3 -> reset_trigger;
-		@ (reset_done_trigger);
-		$readmemh("tb/mulovertest.ram", main.RAM.memory); 
+		@(reset_done_trigger);
+		$readmemh("tb/mulovertest.ram", main.RAM.memory);
 		#100 if (main.MIPS.REGISTERS.registers[29] == 'h3fff0001)
 			$display("Deu overflow! Tudo certo!");
 		else
@@ -140,5 +143,6 @@ module main;
 	end
 
 	initial
-		#1000  $finish;
+		#270  $finish;
+
 endmodule /* main */
